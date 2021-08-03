@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7359610f7575567a88d8f015525da250",
+    "content-hash": "c02493ac8101e220a2d2541e69d3bcce",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -3219,49 +3219,6 @@
                 }
             ],
             "time": "2020-08-18T17:17:46+00:00"
-        },
-        {
-            "name": "skrtdev/curl",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/skrtdev/curl.git",
-                "reference": "5bee0507a9e79130d62a1d7e53f94be09550521f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/skrtdev/curl/zipball/5bee0507a9e79130d62a1d7e53f94be09550521f",
-                "reference": "5bee0507a9e79130d62a1d7e53f94be09550521f",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.4"
-            },
-            "provide": {
-                "ext-curl": "*"
-            },
-            "default-branch": true,
-            "type": "library",
-            "autoload": {
-                "files": []
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Gaetano Sutera",
-                    "email": "gaetanosutera@yahoo.it",
-                    "role": "Developer"
-                }
-            ],
-            "description": "A curl_* polyfill for php",
-            "support": {
-                "issues": "https://github.com/skrtdev/curl/issues",
-                "source": "https://github.com/skrtdev/curl/tree/master"
-            },
-            "time": "2021-05-05T14:43:10+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -8352,9 +8309,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "skrtdev/curl": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
