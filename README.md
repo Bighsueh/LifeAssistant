@@ -1,5 +1,5 @@
 Heroku Webhook URL
-https://laravel-line-assistant.herokuapp.com/callback
+https://laravel-line-assistant.herokuapp.com/api/callback
 
 --------------------
 
