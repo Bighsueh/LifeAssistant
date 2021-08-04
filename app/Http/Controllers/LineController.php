@@ -27,6 +27,33 @@ class LineController extends Controller
 
     public function index(Request $request)
     {
-      //
+        $params = $request->all();
+        logger(json_encode($params, JSON_UNESCAPED_UNICODE));
+//        error_log(json_encode('1'));
+        return response('ok', '200');
+    }
+
+    public function webhook(Request $request)
+    {
+        $bot = $this->bot;
+        $signature = $request->header(\LINE\LINEBot\Constant\HTTPHeader::LINE_SIGNATURE);
+        $body = $request->getContent();
+        try {
+            $events = $bot->parseEventRequest($body, $signature);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+        }
+        foreach ($events as $event) {
+            $replyToken = $event->getReplyToken();
+            if ($event instanceof MessageEvent) {
+                $message_type = $event->getMessageType();
+                $text = $event->getText();
+                switch ($message_type) {
+                    case 'text':
+                        $bot->replyText($replyToken, 'Hello world!');
+                        break;
+                }
+            }
+        }
     }
 }
