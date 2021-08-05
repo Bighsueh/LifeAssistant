@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use LINE\LINEBot;
 use LINE\LINEBot\Event\MessageEvent;
+use LINE\LINEBot\Constant\HTTPHeader;
 use LINE\LINEBot\HTTPClient\CurlHTTPClient;
 
 class LineController extends Controller
@@ -36,24 +37,29 @@ class LineController extends Controller
     public function webhook(Request $request)
     {
         $bot = $this->bot;
-        $signature = $request->header(\LINE\LINEBot\Constant\HTTPHeader::LINE_SIGNATURE);
+        $signature = $request->header(HTTPHeader::LINE_SIGNATURE);
         $body = $request->getContent();
         try {
             $events = $bot->parseEventRequest($body, $signature);
+            foreach ($events as $event) {
+                $replyToken = $event->getReplyToken();
+                if ($event instanceof MessageEvent) {
+                    $message_type = $event->getMessageType(); //接收的資料型態
+                    Log::debug($message_type);
+                    switch ($message_type){
+                        case 'text':
+                            $text = $event->getText(); //接收的訊息內容
+                            $bot->replyText($replyToken, $text);
+                    }
+
+                }
+
+            }
+
         } catch (\Exception $e) {
             Log::error($e->getMessage());
         }
-        foreach ($events as $event) {
-            $replyToken = $event->getReplyToken();
-            if ($event instanceof MessageEvent) {
-                $message_type = $event->getMessageType();
-                $text = $event->getText();
-                switch ($message_type) {
-                    case 'text':
-                        $bot->replyText($replyToken, 'Hello world!');
-                        break;
-                }
-            }
-        }
+
+
     }
 }
