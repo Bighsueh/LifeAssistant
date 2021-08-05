@@ -13,7 +13,8 @@
         "laravel/tinker": "^2.5",
         "linecorp/line-bot-sdk": "^7.1",
         "php-http/curl-client": "^2.2",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ext-curl": "*"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
