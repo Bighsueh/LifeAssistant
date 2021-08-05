@@ -45,11 +45,18 @@ class LineController extends Controller
                 $replyToken = $event->getReplyToken();
                 if ($event instanceof MessageEvent) {
                     $message_type = $event->getMessageType(); //接收的資料型態
-                    Log::debug($message_type);
-                    switch ($message_type){
+                    Log::info($message_type);
+                    switch ($message_type) {
                         case 'text':
                             $text = $event->getText(); //接收的訊息內容
+                            if(str_contains($text,'嘉義')){
+                                $locationName = '嘉義';
+                                $weather = $this->getWeather();
+                                $bot->replyText($replyToken, $weather);
+                            }
                             $bot->replyText($replyToken, $text);
+                        case 'sticker':
+                            $bot->replyText($replyToken, 'sticker');
                     }
 
                 }
@@ -59,7 +66,38 @@ class LineController extends Controller
         } catch (\Exception $e) {
             Log::error($e->getMessage());
         }
-
-
     }
+
+    public function getWeather()
+    {
+        //氣象局api -三十六小時天氣預報
+        $api = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=CWB-00F3A987-1CDD-4249-90E1-168F817F5590&format=JSON";
+
+        //get json
+        $json_raw = file_get_contents($api);
+        //JSON_UNESCAPED_UNICODE = json不進行轉碼
+        $json = json_decode($json_raw, JSON_UNESCAPED_UNICODE);
+
+        /*中央氣象局資料說明：
+            Wx:天氣現象
+            MaxT:最高溫度
+            MinT:最低溫度
+            CI:舒適度
+            PoP:降雨機率
+         */
+        $r = [];
+        foreach ($json['records']['location'] as $row){
+            if($row['locationName'] = '桃園'){
+                dd($row);
+                break;
+            }
+        }
+
+
+
+
+
+        return 'weather';
+    }
+
 }
