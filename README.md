@@ -31,3 +31,9 @@ https://devcenter.heroku.com/articles/heroku-cli#download-and-install
 ```
 php artisan route:list
 ```
+
+--------------------
+Coding中遇到的Bug串(已解決)：
+
+若Laravel.log 遇到 Invalid signature has given 
+-> 抓不到channel_secret
