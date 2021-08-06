@@ -1,6 +1,9 @@
 Heroku Webhook URL
 https://laravel-line-assistant.herokuapp.com/api/callback
 
+民生示警公開資料平台
+https://alerts.ncdr.nat.gov.tw/RSS.aspx#
+
 --------------------
 
 安裝套件
