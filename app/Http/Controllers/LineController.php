@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\GetApiService;
+use App\Services\ValidateDataService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use LINE\LINEBot;
@@ -12,13 +13,16 @@ use LINE\LINEBot\HTTPClient\CurlHTTPClient;
 
 class LineController extends Controller
 {
-//    private $client;
+    //line-bot
     private $bot;
     private $channel_access_token;
     private $channel_secret;
-    private $getApiService;
 
-    public function __construct(GetApiService $getApiService)
+    //Services
+    private $getApiService;
+    private $validateDataService;
+
+    public function __construct(GetApiService $getApiService,ValidateDataService $validateDataService)
     {
         //用env內的Channel_access_token & Channel secret建立一個LineBot物件
         $this->channel_access_token = env('CHANNEL_ACCESS_TOKEN');
@@ -27,6 +31,7 @@ class LineController extends Controller
         $this->bot = new LINEBot($httpClient, ['channelSecret' => $this->channel_secret]);
         $this->client = $httpClient;
         $this->getApiService = $getApiService;
+        $this->validateDataService = $validateDataService;
 
     }
 
@@ -53,15 +58,15 @@ class LineController extends Controller
                     switch ($message_type) {
                         case 'text':
                             $text = $event->getText(); //接收的訊息內容
-                            if (str_contains($text, '桃園')) {
-                                $weather = $this->getApiService->getWeather_36hours();
+                            $countyName = $this->validateDataService->getCountyName($text);
+                            if ($countyName !== 'none') {
+                                $weather = $this->getApiService->getThirtySixHoursWeather($countyName);
                                 $bot->replyText($replyToken, $weather);
                             }
-                            $bot->replyText($replyToken, $text);
                             break;
-                        case 'sticker':
-                            $bot->replyText($replyToken, 'sticker');
-                            break;
+//                        case 'sticker':
+//                            $bot->replyText($replyToken, 'sticker');
+//                            break;
                     }
 
                 }
