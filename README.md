@@ -4,7 +4,7 @@ https://laravel-line-assistant.herokuapp.com/api/callback
 Heroku Cli command
 ```
 heroku login
-heroku logs --tail --app {HEROKU_APP_NAME}
+heroku logs --tail --app laravel-line-assistant
 ```
 
 
