@@ -10,6 +10,7 @@ use LINE\LINEBot;
 use LINE\LINEBot\Event\MessageEvent;
 use LINE\LINEBot\Constant\HTTPHeader;
 use LINE\LINEBot\HTTPClient\CurlHTTPClient;
+use mysql_xdevapi\Exception;
 
 class LineController extends Controller
 {
@@ -22,7 +23,7 @@ class LineController extends Controller
     private $getApiService;
     private $validateDataService;
 
-    public function __construct(GetApiService $getApiService,ValidateDataService $validateDataService)
+    public function __construct(GetApiService $getApiService, ValidateDataService $validateDataService)
     {
         //用env內的Channel_access_token & Channel secret建立一個LineBot物件
         $this->channel_access_token = env('CHANNEL_ACCESS_TOKEN');
@@ -57,23 +58,40 @@ class LineController extends Controller
                     Log::info($message_type);
                     switch ($message_type) {
                         case 'text':
+                            $messageBuilder = new LINEBot\MessageBuilder\MultiMessageBuilder();
                             $text = $event->getText(); //接收的訊息內容
+
+                            //若包含鄉鎮市則帶出天氣
                             $countyName = $this->validateDataService->getCountyName($text);
                             if ($countyName !== 'none') {
-                                $weather = $this->getApiService->getThirtySixHoursWeather($countyName);
-                                $bot->replyText($replyToken, $weather);
+                                $weather = new LINEBot\MessageBuilder\TextMessageBuilder(
+                                    $this->getApiService->getThirtySixHoursWeather($countyName)
+                                );
+                                $messageBuilder->add($weather);
+                                $bot->replyMessage($replyToken, $messageBuilder);
+                                break;
                             }
-                            break;
-//                        case 'sticker':
-//                            $bot->replyText($replyToken, 'sticker');
-//                            break;
+
+                            //若包含"地震"則帶入地震圖片
+                            if (str_contains($text, '地震')) {
+                                $earthquake_text = new LINEBot\MessageBuilder\TextMessageBuilder('最近顯著有感地震：');
+                                $messageBuilder->add($earthquake_text);
+
+                                $image = new LINEBot\MessageBuilder\ImageMessageBuilder(
+                                    $this->getApiService->getEarthquake(),
+                                    $this->getApiService->getEarthquake()
+                                );
+                                $messageBuilder->add($image);
+                                $bot->replyMessage($replyToken, $messageBuilder);
+                                break;
+
+                            }
+
                     }
-
                 }
-
             }
-
-        } catch (\Exception $e) {
+        } catch
+        (\Exception $e) {
             Log::error($e->getMessage());
         }
     }

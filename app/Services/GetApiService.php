@@ -58,4 +58,17 @@ class GetApiService
 
         return $reply;
     }
+
+    public function getEarthquake()
+    {
+        //抓取最近地震
+        //get json
+        $api = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/E-A0015-001?Authorization=CWB-00F3A987-1CDD-4249-90E1-168F817F5590";
+        $json_raw = file_get_contents($api);    //get json
+        $json = json_decode($json_raw, JSON_UNESCAPED_UNICODE); //JSON_UNESCAPED_UNICODE = json不進行轉碼
+
+        //get image url
+        $image_url = $json['records']['earthquake'][0]['reportImageURI'];
+        return $image_url;
+    }
 }
