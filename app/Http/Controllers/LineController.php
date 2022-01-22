@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ExpensesService;
 use App\Services\GetApiService;
 use App\Services\ValidateDataService;
 use Illuminate\Http\Request;
@@ -22,8 +23,9 @@ class LineController extends Controller
     //Services
     private $getApiService;
     private $validateDataService;
+    private $expensesService;
 
-    public function __construct(GetApiService $getApiService, ValidateDataService $validateDataService)
+    public function __construct(GetApiService $getApiService, ValidateDataService $validateDataService, ExpensesService $expensesService)
     {
         //用env內的Channel_access_token & Channel secret建立一個LineBot物件
         $this->channel_access_token = env('CHANNEL_ACCESS_TOKEN');
@@ -33,7 +35,7 @@ class LineController extends Controller
         $this->client = $httpClient;
         $this->getApiService = $getApiService;
         $this->validateDataService = $validateDataService;
-
+        $this->expensesService = $expensesService;
     }
 
     public function index(Request $request)
@@ -87,6 +89,46 @@ class LineController extends Controller
 
                             }
 
+                            //驗證字串為 空白+數字結尾
+                            $format_text = preg_match("/\s\d{1,6}$/", $text);
+                            //記帳功能
+                            if ($format_text) {
+                                //儲存狀態
+                                $response = $this->expensesService->get_text($text);
+
+                                //儲存成功
+                                if ($response === 'success') $reply_text = "已收到記帳 " . $text;
+
+                                //儲存錯誤
+                                if ($response !== 'success') $reply_text = "出現錯誤，錯誤訊息：" . $response;
+
+                                $result = new LINEBot\MessageBuilder\TextMessageBuilder($reply_text);
+                                $messageBuilder->add($result);
+                                $bot->replyMessage($replyToken, $messageBuilder);
+
+                                break;
+                            }
+
+
+                            if (str_contains($text, '紀錄')) {
+                                $reponse = null;
+                                if (str_contains($text, "今日")) {
+                                    $reponse = $this->expensesService->get_today();
+                                }
+                                if (str_contains($text, "本周")) {
+                                    $reponse = $this->expensesService->get_currentWeek();
+                                }
+                                if (str_contains($text, "本月")) {
+                                    $reponse = $this->expensesService->get_currentMonth();
+                                }
+                                if ($reponse !== null) {
+                                    $result = new LINEBot\MessageBuilder\TextMessageBuilder($reponse);
+                                    $messageBuilder->add($result);
+                                    $bot->replyMessage($replyToken, $messageBuilder);
+                                };
+
+                                break;
+                            }
                     }
                 }
             }
